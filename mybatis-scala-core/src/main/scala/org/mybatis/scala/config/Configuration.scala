@@ -315,6 +315,9 @@ object Configuration {
     def lazyLoadTriggerMethods(names: Set[String]) = 
       set(21, pre) { _.setLazyLoadTriggerMethods(names) }
     
+    def defaultScriptingLanguage(driver : T[_]) =
+      set(23, pre) { _.setDefaultScriptingLanguage(driver.unwrap) }
+    
     def environment(id: String, transactionFactory: TransactionFactory, dataSource: javax.sql.DataSource) =
       set(24, pre) { _.setEnvironment(new Environment(id, transactionFactory, dataSource)) }
 
@@ -357,7 +360,6 @@ object Configuration {
     
     // TODO (3.1.1) def proxyFactory(factory: ProxyFactory) = set( 7, pre) { _.setProxyFactory(factory) }
     // TODO (3.1.1) def safeResultHandlerSupport(enabled : Boolean) = set(22, pre) { _.setSafeResultHandlerEnabled(enabled) }
-    // TODO (3.1.1) def defaultScriptingLanguage(driver : T[_]) = set(23, pre) { _.setDefaultScriptingLanguage(driver) }
 
   }
 

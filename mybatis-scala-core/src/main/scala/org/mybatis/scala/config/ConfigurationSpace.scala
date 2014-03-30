@@ -161,6 +161,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
   private def addStatement(statement : Statement) : this.type = {
     if (statement.fqi == null) {
       statement.fqi = ConfigurationSpace.generateFQI(spaceName, statement)
+      statement.languageDriver = resolveLanguageDriver(statement)
       statement match {
         case stmt : Select =>
           if (stmt.resultMap != null) addResultMap(stmt.resultMap)
@@ -183,7 +184,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
             null,
             null,
             stmt.databaseId,
-            DefaultScriptingDriver
+            resolveLanguageDriver(stmt)
           )
         case stmt : Insert[_] =>
           builderAssistant.addMappedStatement(
@@ -205,7 +206,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
             if (stmt.keyGenerator == null) null else stmt.keyGenerator.keyProperty,
             if (stmt.keyGenerator == null) null else stmt.keyGenerator.keyColumn,
             stmt.databaseId,
-            DefaultScriptingDriver
+            stmt.languageDriver
           )
         case stmt : Update[_] =>
           builderAssistant.addMappedStatement(
@@ -227,7 +228,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
             null,
             null,
             stmt.databaseId,
-            DefaultScriptingDriver
+            stmt.languageDriver
           )
         case stmt : Delete[_] =>
           builderAssistant.addMappedStatement(
@@ -249,7 +250,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
             null,
             null,
             stmt.databaseId,
-            DefaultScriptingDriver
+            stmt.languageDriver
           )
         case stmt : Perform =>
           builderAssistant.addMappedStatement(
@@ -271,7 +272,7 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
             null,
             null,
             stmt.databaseId,
-            DefaultScriptingDriver
+            stmt.languageDriver
           )
         case unsupported =>
           throw new ConfigurationException("Unsupported statement type")
@@ -294,6 +295,17 @@ class ConfigurationSpace(configuration : MBConfig, val spaceName : String = "_DE
         new NoKeyGenerator()
     }
   }
+
+  /**
+   * Resolve the LanguageDriver for a statement.
+   * Use the LanguageDriver in MBConfig as default if the LanguageDriver of the statement is not specified.
+   * The return value(LanguageDriver) must not be null.
+   *
+   * @param statement a statement which is being added to ConfigurationSpace
+   * @return
+   */
+  private def resolveLanguageDriver(statement: Statement) : LanguageDriver
+    = Option(statement.languageDriver).getOrElse(configuration.getDefaultScriptingLanuageInstance)
 
   private def buildSqlKeyGenerator(generator : SqlGeneratedKey[_], parameterTypeClass : Class[_], baseId : String, databaseId : String) : MBKeyGenerator = {
 

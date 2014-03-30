@@ -16,6 +16,8 @@
 
 package org.mybatis.scala.mapping
 
+import org.mybatis.scala.config.LanguageDriver
+
 /** Abstract SQL statement mapping.
   * @version \$Revision$
   */
@@ -46,7 +48,7 @@ trait Statement {
   var databaseId : String = null
 
   /** Scripting driver */
-  var languageDriver = org.mybatis.scala.config.DefaultScriptingDriver 
+  var languageDriver : LanguageDriver = null
   
   /** Dynamic SQL definition, an xml node with root &lt;xsql&gt;
     * == Code sample ==
